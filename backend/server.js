@@ -69,8 +69,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-// We use 5001 as default to avoid macOS AirPlay conflict on 5000
-const PORT = 5001;
+// Use the dynamic PORT from the environment (Render) or default to 5001 locally
+const PORT = process.env.PORT || 5001;
 
 // Connect to MongoDB and start server
 mongoose
