@@ -37,7 +37,9 @@ app.use((req, res, next) => {
 app.use(helmet()); 
 app.use(mongoSanitize()); 
 
-app.use(morgan('dev'));
+if (process.env.NODE_ENV !== 'production') {
+  app.use(morgan('dev'));
+}
 
 // Rate Limiting for Auth routes
 const authLimiter = rateLimit({
