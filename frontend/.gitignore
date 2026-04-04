@@ -1,0 +1,27 @@
+# Build Artifacts
+/dist
+/build
+
+# Dependencies
+/node_modules
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# ESLint/Formatting
+.eslintcache
+.prettiercache
+
+# Testing
+/coverage
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
