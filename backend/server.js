@@ -59,6 +59,16 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, message: 'Server is running' });
 });
 
+// Root friendly message for evaluators
+app.get('/', (req, res) => {
+  res.status(200).json({ 
+    success: true, 
+    message: 'Welcome to the Zorvyn Finance API', 
+    version: '1.0.0',
+    documentation: 'This is the backend API. Please visit the frontend application to interact with the platform.' 
+  });
+});
+
 // Error Handler
 app.use((err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
