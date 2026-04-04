@@ -40,6 +40,8 @@ const Transactions = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+
   const fetchTransactions = async () => {
     try {
       setLoading(true);
@@ -48,7 +50,7 @@ const Transactions = () => {
         if (value) queryParams.append(key, value);
       });
       
-      const res = await axios.get(`http://localhost:5001/api/transactions?${queryParams.toString()}`, {
+      const res = await axios.get(`${API_URL}/api/transactions?${queryParams.toString()}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setTransactions(res.data.data);

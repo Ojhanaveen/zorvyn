@@ -31,10 +31,12 @@ const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+
   useEffect(() => {
     const fetchSummary = async () => {
       try {
-        const res = await axios.get('http://localhost:5001/api/transactions/summary', {
+        const res = await axios.get(`${API_URL}/api/transactions/summary`, {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         setData(res.data.data);

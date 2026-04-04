@@ -22,10 +22,12 @@ const Users = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:5001/api/users', {
+      const res = await axios.get(`${API_URL}/api/users`, {
         headers: { Authorization: `Bearer ${currentUser.token}` }
       });
       setUsers(res.data.data);
@@ -43,7 +45,7 @@ const Users = () => {
   const toggleStatus = async (userId, currentStatus) => {
     try {
       const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
-      await axios.put(`http://localhost:5001/api/users/${userId}`, { status: newStatus }, {
+      await axios.put(`${API_URL}/api/users/${userId}`, { status: newStatus }, {
         headers: { Authorization: `Bearer ${currentUser.token}` }
       });
       fetchUsers();
