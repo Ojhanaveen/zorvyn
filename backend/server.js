@@ -1,3 +1,10 @@
+console.log('⏳ Initializing server script...');
+
+process.on('uncaughtException', (err) => {
+  console.error('💥 UNCAUGHT EXCEPTION:', err);
+  process.exit(1);
+});
+
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -6,6 +13,11 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const mongoSanitize = require('express-mongo-sanitize');
 const rateLimit = require('express-rate-limit');
+
+if (!process.env.MONGODB_URI) {
+  console.error('❌ FATAL ERROR: MONGODB_URI environment variable is missing.');
+  process.exit(1);
+}
 
 const authRoutes = require('./routes/auth');
 const transactionRoutes = require('./routes/transactions');
