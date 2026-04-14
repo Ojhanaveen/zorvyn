@@ -4,7 +4,7 @@ const User = require('../models/User');
 
 const adminData = {
   name: 'Admin',
-  email: 'admin@zorvyn.com',
+  email: 'admin@finma.com',
   password: 'admin@12345',
   role: 'Admin',
   status: 'Active'

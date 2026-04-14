@@ -40,7 +40,7 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
             Z
           </div>
           {!isCollapsed && (
-            <span className="text-xl font-display font-bold tracking-tight text-slate-900 lowercase animate-in fade-in slide-in-from-left-2">Zorvyn</span>
+            <span className="text-xl font-display font-bold tracking-tight text-slate-900 lowercase animate-in fade-in slide-in-from-left-2">Finma</span>
           )}
         </div>
         {!isCollapsed && (

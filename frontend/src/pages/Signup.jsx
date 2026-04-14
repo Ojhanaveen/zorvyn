@@ -94,7 +94,7 @@ const Signup = () => {
           <div className="p-8 md:p-16 flex flex-col justify-center">
             <div className="mb-10 text-center md:text-left">
               <h1 className="text-3xl font-display font-bold text-slate-900 mb-2 tracking-tight">Create your account</h1>
-              <p className="text-slate-500 font-medium">Get started with Zorvyn today.</p>
+              <p className="text-slate-500 font-medium">Get started with Finma today.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">

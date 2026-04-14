@@ -13,7 +13,7 @@ const Footer = () => {
                 <LayoutDashboard className="text-white w-5 h-5" />
               </div>
               <span className="text-xl font-display font-bold text-white tracking-tight">
-                Zorvyn
+                Finma
               </span>
             </div>
             <p className="text-slate-400 text-lg leading-relaxed max-w-md">
@@ -45,7 +45,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-slate-500 text-sm">
-            © {new Date().getFullYear()} Zorvyn Inc. All rights reserved.
+            © {new Date().getFullYear()} Finma Inc. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <a href="#" className="text-slate-500 hover:text-white transition-colors"><Code2 size={20} /></a>

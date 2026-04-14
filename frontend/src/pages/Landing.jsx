@@ -34,7 +34,7 @@ const Landing = () => {
             
             <p className="max-w-2xl mx-auto text-xl text-slate-500 mb-12 leading-relaxed">
               Experience the power of real-time financial tracking and granular access control. 
-              Zorvyn provides a secure, blazingly fast ecosystem for your enterprise data.
+              Finma provides a secure, blazingly fast ecosystem for your enterprise data.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -154,7 +154,7 @@ const Landing = () => {
               Everything you need to scale
             </h2>
             <p className="text-slate-500 text-lg max-w-2xl mx-auto">
-              Zorvyn combines powerful analytics with enterprise-grade security.
+              Finma combines powerful analytics with enterprise-grade security.
             </p>
           </div>
 
@@ -202,7 +202,7 @@ const Landing = () => {
             Ready to take control of your data?
           </h2>
           <p className="text-indigo-100 text-xl mb-12 max-w-2xl mx-auto">
-            Join 1,000+ teams who use Zorvyn to power their financial dashboards.
+            Join 1,000+ teams who use Finma to power their financial dashboards.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
              <Link 

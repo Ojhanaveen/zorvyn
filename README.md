@@ -1,4 +1,4 @@
-# Zorvyn Finance 🚀
+# Finma Finance 🚀
 
 A premium, role-based financial management engine designed for high-performance data tracking, deep-dive analytics, and secure organizational management.
 

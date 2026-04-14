@@ -13,7 +13,7 @@ const Navbar = () => {
               <LayoutDashboard className="text-white w-6 h-6" />
             </div>
             <span className="text-2xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 tracking-tight">
-              Zorvyn
+              Finma
             </span>
           </Link>
 

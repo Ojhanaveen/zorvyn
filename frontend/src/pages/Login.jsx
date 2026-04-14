@@ -62,7 +62,7 @@ const Login = () => {
             
             <div className="relative z-10">
               <h2 className="text-4xl font-display font-extrabold mb-8 leading-tight">
-                Welcome back to <br /> Zorvyn Finance.
+                Welcome back to <br /> Finma Finance.
               </h2>
               <ul className="space-y-6">
                 <li className="flex items-start gap-4">
@@ -93,7 +93,7 @@ const Login = () => {
           {/* Right Side: Form */}
           <div className="p-8 md:p-16 flex flex-col justify-center">
             <div className="mb-10 text-center md:text-left">
-              <h1 className="text-3xl font-display font-bold text-slate-900 mb-2 tracking-tight">Log in to Zorvyn</h1>
+              <h1 className="text-3xl font-display font-bold text-slate-900 mb-2 tracking-tight">Log in to Finma</h1>
               <p className="text-slate-500 font-medium">Enter your credentials to access your account.</p>
             </div>
 

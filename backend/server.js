@@ -63,7 +63,7 @@ app.get('/api/health', (req, res) => {
 app.get('/', (req, res) => {
   res.status(200).json({ 
     success: true, 
-    message: 'Welcome to the Zorvyn Finance API', 
+    message: 'Welcome to the Finma Finance API', 
     version: '1.0.0',
     documentation: 'This is the backend API. Please visit the frontend application to interact with the platform.' 
   });
