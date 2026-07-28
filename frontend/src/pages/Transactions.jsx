@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
-import { 
-  Search, 
-  Filter, 
-  ArrowUpDown, 
-  Download, 
-  Trash2, 
-  Edit3, 
+import TransactionModal from '../components/TransactionModal';
+import ConfirmDialog from '../components/ConfirmDialog';
+import * as transactionsApi from '../api/transactions';
+import {
+  Search,
+  Filter,
+  Download,
+  Trash2,
+  Edit3,
   Plus,
-  X,
-  CreditCard,
   ChevronLeft,
   ChevronRight,
   Receipt
@@ -21,39 +20,27 @@ const Transactions = () => {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    type: '',
-    category: '',
-    startDate: '',
-    endDate: '',
-    search: ''
-  });
+  const [filters, setFilters] = useState({ type: '', category: '', startDate: '', endDate: '', search: '' });
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // Debounce search input
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingTrx, setEditingTrx] = useState(null);
+  const [deletingTrx, setDeletingTrx] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      setFilters(prev => ({ ...prev, search: searchTerm }));
+      setFilters((prev) => ({ ...prev, search: searchTerm }));
     }, 500);
-
     return () => clearTimeout(timer);
   }, [searchTerm]);
-
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      const queryParams = new URLSearchParams();
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value) queryParams.append(key, value);
-      });
-      
-      const res = await axios.get(`${API_URL}/api/transactions?${queryParams.toString()}`, {
-        headers: { Authorization: `Bearer ${user.token}` }
-      });
-      setTransactions(res.data.data);
+      const res = await transactionsApi.getTransactions(filters);
+      setTransactions(res.data);
     } catch (err) {
       console.error('Error fetching transactions:', err);
     } finally {
@@ -63,16 +50,66 @@ const Transactions = () => {
 
   useEffect(() => {
     fetchTransactions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
-  const handleFilterChange = (e) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
-  };
+  const handleFilterChange = (e) => setFilters({ ...filters, [e.target.name]: e.target.value });
 
   const clearFilters = () => {
     setFilters({ type: '', category: '', startDate: '', endDate: '', search: '' });
     setSearchTerm('');
   };
+
+  const openAddModal = () => { setEditingTrx(null); setModalOpen(true); };
+  const openEditModal = (trx) => { setEditingTrx(trx); setModalOpen(true); };
+
+  const handleSave = async (payload) => {
+    if (editingTrx) {
+      await transactionsApi.updateTransaction(editingTrx._id, payload);
+    } else {
+      await transactionsApi.createTransaction(payload);
+    }
+    fetchTransactions();
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingTrx) return;
+    setDeleting(true);
+    try {
+      await transactionsApi.deleteTransaction(deletingTrx._id);
+      setDeletingTrx(null);
+      fetchTransactions();
+    } catch (err) {
+      console.error('Error deleting transaction:', err);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const exportCsv = () => {
+    const header = ['Date', 'Type', 'Category', 'Amount', 'Notes', 'Created By'];
+    const rows = transactions.map((t) => [
+      new Date(t.date).toLocaleDateString(),
+      t.type,
+      t.category,
+      t.amount,
+      (t.notes || '').replace(/,/g, ';'),
+      t.createdBy?.name || ''
+    ]);
+    const csv = [header, ...rows].map((row) => row.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `transactions-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const categories = useMemo(
+    () => [...new Set(transactions.map((t) => t.category))].sort(),
+    [transactions]
+  );
 
   return (
     <Layout>
@@ -83,13 +120,12 @@ const Transactions = () => {
             <p className="text-slate-500 font-medium">Browse and manage all financial entries.</p>
           </div>
           <div className="flex gap-2">
-            <button className="btn btn-outline h-11">
+            <button onClick={exportCsv} className="btn btn-outline h-11 flex items-center gap-2 px-4 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50">
               <Download size={18} />
               <span>Export</span>
             </button>
-            {/* Only Admin can add records */}
-            {user?.role === 'Admin' && (
-              <button className="btn btn-primary h-11">
+            {(user?.role === 'Admin' || user?.role === 'Analyst') && (
+              <button onClick={openAddModal} className="btn btn-primary h-11 flex items-center gap-2 px-5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700">
                 <Plus size={18} />
                 <span>Add Record</span>
               </button>
@@ -100,17 +136,17 @@ const Transactions = () => {
         <div className="flex flex-col md:flex-row items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm transition-all duration-300">
           <div className="relative flex-1 w-full">
             <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Search category, note, or ID..." 
+            <input
+              type="text"
+              placeholder="Search category or note..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-indigo-500/20 outline-none placeholder:text-slate-400 text-sm font-medium"
             />
           </div>
-          
+
           <div className="flex items-center gap-2 w-full md:w-auto">
-            <button 
+            <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border ${isFilterOpen ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-white border-slate-200 text-slate-600'} text-sm font-bold transition-all`}
             >
@@ -120,20 +156,16 @@ const Transactions = () => {
                 <span className="flex items-center justify-center w-5 h-5 bg-indigo-600 text-white rounded-full text-[10px]">1</span>
               )}
             </button>
-            <div className="h-6 w-px bg-slate-200 hidden md:block"></div>
-            <button className="btn btn-outline px-3 h-10 border-none hover:bg-slate-50">
-              <ArrowUpDown size={18} className="text-slate-400" />
-            </button>
           </div>
         </div>
 
         {isFilterOpen && (
-          <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in slide-in-from-top-2">
+          <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 animate-in fade-in slide-in-from-top-2">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Transaction Type</label>
-              <select 
-                name="type" 
-                value={filters.type} 
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Type</label>
+              <select
+                name="type"
+                value={filters.type}
                 onChange={handleFilterChange}
                 className="w-full bg-white px-3 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/10 outline-none text-sm font-medium"
               >
@@ -144,35 +176,48 @@ const Transactions = () => {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Date Range (From)</label>
-              <input 
-                type="date" 
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Category</label>
+              <select
+                name="category"
+                value={filters.category}
+                onChange={handleFilterChange}
+                className="w-full bg-white px-3 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/10 outline-none text-sm font-medium"
+              >
+                <option value="">All Categories</option>
+                {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">From</label>
+              <input
+                type="date"
                 name="startDate"
                 value={filters.startDate}
                 onChange={handleFilterChange}
-                className="w-full bg-white px-3 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/10 outline-none text-sm font-medium" 
+                className="w-full bg-white px-3 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/10 outline-none text-sm font-medium"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Date Range (To)</label>
-              <input 
-                type="date" 
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">To</label>
+              <input
+                type="date"
                 name="endDate"
                 value={filters.endDate}
                 onChange={handleFilterChange}
-                className="w-full bg-white px-3 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/10 outline-none text-sm font-medium" 
+                className="w-full bg-white px-3 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/10 outline-none text-sm font-medium"
               />
             </div>
 
             <div className="flex items-end gap-2">
-              <button 
+              <button
                 onClick={clearFilters}
                 className="flex-1 px-4 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-700 hover:bg-white rounded-xl transition-all"
               >
                 Clear All
               </button>
-              <button className="flex-1 btn btn-primary py-2.5 text-sm">
+              <button onClick={() => setIsFilterOpen(false)} className="flex-1 btn btn-primary py-2.5 text-sm bg-indigo-600 text-white rounded-xl font-bold">
                 Apply
               </button>
             </div>
@@ -228,10 +273,10 @@ const Transactions = () => {
                     {user.role === 'Admin' && (
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-1 group-hover:opacity-100 opacity-0 transition-opacity">
-                          <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+                          <button onClick={() => openEditModal(trx)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
                             <Edit3 size={16} />
                           </button>
-                          <button className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all">
+                          <button onClick={() => setDeletingTrx(trx)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all">
                             <Trash2 size={16} />
                           </button>
                         </div>
@@ -271,6 +316,23 @@ const Transactions = () => {
           </div>
         </div>
       </div>
+
+      <TransactionModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleSave}
+        initialData={editingTrx}
+      />
+
+      <ConfirmDialog
+        open={!!deletingTrx}
+        onClose={() => setDeletingTrx(null)}
+        onConfirm={confirmDelete}
+        loading={deleting}
+        title="Delete Transaction"
+        message={`Remove the "${deletingTrx?.category}" entry of ₹${deletingTrx?.amount?.toLocaleString()}? This cannot be undone.`}
+        confirmLabel="Delete"
+      />
     </Layout>
   );
 };

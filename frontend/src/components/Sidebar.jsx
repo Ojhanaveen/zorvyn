@@ -1,16 +1,20 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  ReceiptIndianRupee, 
-  Users, 
+import {
+  LayoutDashboard,
+  ReceiptIndianRupee,
+  Users,
   LogOut,
   TrendingDown,
   TrendingUp,
   PieChart as PieChartIcon,
   ChevronRight,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  Wallet,
+  CalendarClock,
+  Target,
+  Users2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -27,6 +31,10 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['Viewer', 'Analyst', 'Admin'] },
     { name: 'Transactions', path: '/transactions', icon: ReceiptIndianRupee, roles: ['Analyst', 'Admin'] },
     { name: 'Analytics', path: '/analytics', icon: PieChartIcon, roles: ['Analyst', 'Admin'] },
+    { name: 'Budgets', path: '/budgets', icon: Wallet, roles: ['Analyst', 'Admin'] },
+    { name: 'Bills & EMIs', path: '/bills', icon: CalendarClock, roles: ['Analyst', 'Admin'] },
+    { name: 'Goals', path: '/goals', icon: Target, roles: ['Analyst', 'Admin'] },
+    { name: 'Split Expenses', path: '/splits', icon: Users2, roles: ['Viewer', 'Analyst', 'Admin'] },
     { name: 'Users', path: '/users', icon: Users, roles: ['Admin'] },
   ];
 

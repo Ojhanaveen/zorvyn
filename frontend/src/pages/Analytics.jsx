@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
+import * as transactionsApi from '../api/transactions';
 import { 
   BarChart, 
   Bar, 
@@ -31,15 +31,11 @@ const Analytics = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res = await axios.get(`${API_URL}/api/transactions/summary`, {
-          headers: { Authorization: `Bearer ${user.token}` }
-        });
-        setData(res.data.data);
+        const res = await transactionsApi.getSummary();
+        setData(res.data);
       } catch (err) {
         console.error('Error fetching analytics:', err);
       } finally {

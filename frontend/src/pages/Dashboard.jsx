@@ -1,54 +1,70 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Wallet, 
-  ArrowUpRight, 
+import TransactionModal from '../components/TransactionModal';
+import * as transactionsApi from '../api/transactions';
+import * as billsApi from '../api/bills';
+import {
+  TrendingUp,
+  TrendingDown,
+  Wallet,
+  ArrowUpRight,
   ArrowDownRight,
   Plus,
   Receipt,
-  MoreHorizontal
+  MoreHorizontal,
+  AlertTriangle,
+  CalendarClock
 } from 'lucide-react';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer, 
-  PieChart, 
-  Pie, 
-  Cell 
+import {
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell
 } from 'recharts';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const [data, setData] = useState(null);
+  const [upcomingBills, setUpcomingBills] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  const canManageTransactions = user?.role === 'Admin' || user?.role === 'Analyst';
+
+  const fetchSummary = async () => {
+    try {
+      const res = await transactionsApi.getSummary();
+      setData(res.data);
+    } catch (err) {
+      console.error('Error fetching summary:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUpcomingBills = async () => {
+    try {
+      const res = await billsApi.getUpcomingBills(7);
+      setUpcomingBills(res.data);
+    } catch {
+      // Viewers are not authorized for bills; silently skip the widget for them
+      setUpcomingBills([]);
+    }
+  };
 
   useEffect(() => {
-    const fetchSummary = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/api/transactions/summary`, {
-          headers: { Authorization: `Bearer ${user.token}` }
-        });
-        setData(res.data.data);
-      } catch (err) {
-        console.error('Error fetching summary:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchSummary();
+    if (canManageTransactions) fetchUpcomingBills();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  const handleAddTransaction = async (payload) => {
+    await transactionsApi.createTransaction(payload);
+    fetchSummary();
+  };
 
   if (loading) return (
     <div className="h-screen flex items-center justify-center">
@@ -60,6 +76,7 @@ const Dashboard = () => {
   );
 
   const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+  const budgetAlerts = (data?.budgetAlerts || []).filter((b) => b.status !== 'On Track');
 
   return (
     <Layout>
@@ -68,10 +85,9 @@ const Dashboard = () => {
           <h1 className="text-4xl font-display font-bold text-slate-900 tracking-tight">Finance Overview</h1>
           <p className="text-slate-500 font-medium">Welcome back, {user?.name}. Here's what's happening today.</p>
         </div>
-        {/* Only Admin can add new entries */}
-        {user?.role === 'Admin' && (
+        {canManageTransactions && (
           <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 hover:shadow-indigo-200 transition-all active:scale-[0.98]">
+            <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 hover:shadow-indigo-200 transition-all active:scale-[0.98]">
               <Plus size={18} />
               <span>New Entry</span>
             </button>
@@ -93,7 +109,7 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-lg">
-                <ArrowUpRight size={14} /> +12.5% vs last month
+                <ArrowUpRight size={14} /> Total recorded income
               </div>
               <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
             </div>
@@ -109,7 +125,7 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-rose-600 bg-rose-50 w-fit px-2 py-1 rounded-lg">
-                <ArrowDownRight size={14} /> +4.2% vs last month
+                <ArrowDownRight size={14} /> Total recorded expenses
               </div>
               <div className="absolute top-0 right-0 w-32 h-32 bg-rose-50/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
             </div>
@@ -125,11 +141,59 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="mt-4 text-xs font-medium text-white/70">
-                Available for withdrawal
+                Income minus expenses
               </div>
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/4" />
             </div>
           </div>
+
+          {(budgetAlerts.length > 0 || (canManageTransactions && upcomingBills.length > 0)) && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {budgetAlerts.length > 0 && (
+                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                  <div className="flex items-center gap-2 mb-4">
+                    <AlertTriangle size={18} className="text-amber-500" />
+                    <h3 className="font-bold text-slate-900">Budget Alerts</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {budgetAlerts.map((b) => (
+                      <div key={b._id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                        <div>
+                          <span className="text-sm font-bold text-slate-800">{b.category}</span>
+                          <p className="text-xs text-slate-400 font-semibold">₹{b.spent.toLocaleString()} of ₹{b.monthlyLimit.toLocaleString()}</p>
+                        </div>
+                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md border ${b.status === 'Exceeded' ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-amber-50 text-amber-600 border-amber-100'}`}>
+                          {b.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <Link to="/budgets" className="mt-4 inline-block text-indigo-600 text-xs font-bold hover:underline">Manage budgets</Link>
+                </div>
+              )}
+
+              {canManageTransactions && upcomingBills.length > 0 && (
+                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                  <div className="flex items-center gap-2 mb-4">
+                    <CalendarClock size={18} className="text-indigo-500" />
+                    <h3 className="font-bold text-slate-900">Upcoming Bills (7 days)</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {upcomingBills.map((bill) => (
+                      <div key={bill._id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                        <div>
+                          <span className="text-sm font-bold text-slate-800">{bill.name}</span>
+                          <p className="text-xs text-slate-400 font-semibold">Due {new Date(bill.nextDueDate).toLocaleDateString()}</p>
+                        </div>
+                        <span className="text-sm font-black text-slate-900">₹{bill.amount.toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <Link to="/bills" className="mt-4 inline-block text-indigo-600 text-xs font-bold hover:underline">View all bills</Link>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             <div className="lg:col-span-3 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm h-fit">
@@ -142,7 +206,7 @@ const Dashboard = () => {
                   <MoreHorizontal size={20} />
                 </button>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
@@ -162,7 +226,7 @@ const Dashboard = () => {
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip 
+                      <Tooltip
                         contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }}
                       />
                     </PieChart>
@@ -180,9 +244,9 @@ const Dashboard = () => {
                         <span className="text-sm font-bold text-slate-900">₹{item.total.toLocaleString()}</span>
                       </div>
                       <div className="w-full h-1.5 bg-slate-50 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full rounded-full transition-all duration-1000 ease-out" 
-                          style={{ 
+                        <div
+                          className="h-full rounded-full transition-all duration-1000 ease-out"
+                          style={{
                             background: COLORS[i % COLORS.length],
                             width: `${(item.total / (data.summary.income + data.summary.expense) * 100).toFixed(0)}%`
                           }}
@@ -200,7 +264,6 @@ const Dashboard = () => {
                   <h3 className="text-xl font-display font-bold text-slate-900">Recent Activity</h3>
                   <p className="text-sm text-slate-500 mt-1">Latest financial movements</p>
                 </div>
-                {/* Viewers only see dashboard, Analysts can see all transactions */}
                 {user?.role !== 'Viewer' && (
                   <Link to="/transactions" className="text-indigo-600 text-sm font-bold hover:text-indigo-700 transition-colors">
                     See All
@@ -242,14 +305,16 @@ const Dashboard = () => {
           </div>
           <h2 className="text-2xl font-display font-bold text-slate-900 mb-2">No data recorded yet</h2>
           <p className="text-slate-500 max-w-md mx-auto leading-relaxed">Transactions you add will appear here in the overview.</p>
-          {user?.role === 'Admin' && (
-            <button className="mt-8 btn btn-primary flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 hover:shadow-indigo-200 transition-all active:scale-[0.98]">
+          {canManageTransactions && (
+            <button onClick={() => setModalOpen(true)} className="mt-8 btn btn-primary flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 hover:shadow-indigo-200 transition-all active:scale-[0.98]">
               <Plus size={20} />
               <span>Add Your First Record</span>
             </button>
           )}
         </div>
       )}
+
+      <TransactionModal open={modalOpen} onClose={() => setModalOpen(false)} onSubmit={handleAddTransaction} />
     </Layout>
   );
 };

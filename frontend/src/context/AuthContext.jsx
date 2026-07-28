@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import * as authApi from '../api/auth';
 
 const AuthContext = createContext();
 
@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Initialize from localStorage
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
@@ -19,15 +18,13 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-
   const login = async (email, password, role) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post(`${API_URL}/api/auth/login`, { email, password, role });
-      if (response.data.success) {
-        const userData = response.data.data;
+      const response = await authApi.login(email, password, role);
+      if (response.success) {
+        const userData = response.data;
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
         return true;
@@ -44,14 +41,9 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post(`${API_URL}/api/auth/register`, { 
-        name, 
-        email, 
-        password,
-        role: role || 'Viewer'
-      });
-      if (response.data.success) {
-        const userData = response.data.data;
+      const response = await authApi.register(name, email, password, role);
+      if (response.success) {
+        const userData = response.data;
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
         return true;

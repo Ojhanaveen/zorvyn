@@ -1,6 +1,6 @@
 require('dotenv').config({ path: '../.env' });
 const mongoose = require('mongoose');
-const User = require('../models/User');
+const User = require('../src/modules/users/user.model');
 
 const adminData = {
   name: 'Admin',
@@ -23,9 +23,9 @@ const createAdmin = async () => {
       await admin.save();
     } else {
       admin = await User.create(adminData);
-      console.log(' New Admin user created successfully');
+      console.log('✅ New Admin user created successfully');
     }
-    console.log(` Admin account is ready: ${admin.email}`);
+    console.log(`✅ Admin account is ready: ${admin.email}`);
     process.exit(0);
   } catch (error) {
     console.error('❌ Error creating admin:', error.message);

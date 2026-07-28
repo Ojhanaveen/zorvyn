@@ -8,6 +8,10 @@ import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Users from './pages/Users';
 import Analytics from './pages/Analytics';
+import Budgets from './pages/Budgets';
+import Bills from './pages/Bills';
+import Goals from './pages/Goals';
+import Splits from './pages/Splits';
 import GuestRoute from './components/GuestRoute';
 
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
@@ -55,6 +59,30 @@ const App = () => {
           <Route path="/analytics" element={
             <ProtectedRoute allowedRoles={['Analyst', 'Admin']}>
               <Analytics />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/budgets" element={
+            <ProtectedRoute allowedRoles={['Analyst', 'Admin']}>
+              <Budgets />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/bills" element={
+            <ProtectedRoute allowedRoles={['Analyst', 'Admin']}>
+              <Bills />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/goals" element={
+            <ProtectedRoute allowedRoles={['Analyst', 'Admin']}>
+              <Goals />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/splits" element={
+            <ProtectedRoute allowedRoles={['Viewer', 'Analyst', 'Admin']}>
+              <Splits />
             </ProtectedRoute>
           } />
 
