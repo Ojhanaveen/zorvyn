@@ -17,7 +17,8 @@ const Footer = () => {
               </span>
             </div>
             <p className="text-slate-400 text-lg leading-relaxed max-w-md">
-              A high-performance finance data processing and access control platform designed for modern enterprises. Manage your transactions secure and efficiently.
+              A finance tracker built for real day-to-day money management: budgets with alerts, bill and EMI
+              reminders, savings goals, and split expenses — with secure, role-based access for your team.
             </p>
           </div>
 

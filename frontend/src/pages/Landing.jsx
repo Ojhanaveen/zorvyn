@@ -2,15 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { 
-  ShieldCheck, 
-  BarChart3, 
-  Users, 
-  Zap, 
+import {
+  ShieldCheck,
+  BarChart3,
   ArrowRight,
-  PieChart,
-  Lock,
-  LineChart
+  Wallet,
+  CalendarClock,
+  Target,
+  Users2
 } from 'lucide-react';
 
 const Landing = () => {
@@ -26,15 +25,16 @@ const Landing = () => {
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-indigo-100 rounded-full blur-3xl opacity-30 -z-10" />
             
             <h1 className="text-5xl md:text-7xl font-display font-extrabold text-slate-900 mb-8 tracking-tight leading-[1.1]">
-              Modern Finance <br />
+              Finance Tracking, <br />
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">
-                Data Processing
+                Built for Indian Teams
               </span>
             </h1>
-            
+
             <p className="max-w-2xl mx-auto text-xl text-slate-500 mb-12 leading-relaxed">
-              Experience the power of real-time financial tracking and granular access control. 
-              Finma provides a secure, blazingly fast ecosystem for your enterprise data.
+              Track income and expenses, set category budgets with alerts, stay on top of rent, EMIs
+              and subscriptions, save towards real goals, and split shared costs — all with secure,
+              role-based access for your whole team.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -82,26 +82,26 @@ const Landing = () => {
                       {/* Summary Cards */}
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
-                          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Total Revenue</div>
-                          <div className="text-xl font-bold text-white">₹42.8 Lakhs</div>
-                          <div className="text-[10px] text-emerald-400 font-bold mt-1">▲ 12.5%</div>
+                          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Net Balance</div>
+                          <div className="text-xl font-bold text-white">₹42,800</div>
+                          <div className="text-[10px] text-emerald-400 font-bold mt-1">▲ 12.5% this month</div>
                         </div>
                         <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
-                          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Active Users</div>
-                          <div className="text-xl font-bold text-white">1,240</div>
-                          <div className="text-[10px] text-indigo-400 font-bold mt-1">▲ 4.2%</div>
+                          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Groceries Budget</div>
+                          <div className="text-xl font-bold text-white">78% used</div>
+                          <div className="text-[10px] text-amber-400 font-bold mt-1">▲ Nearing limit</div>
                         </div>
                         <div className="p-4 bg-indigo-600/10 rounded-2xl border border-indigo-500/20">
-                          <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-1">Efficiency</div>
-                          <div className="text-xl font-bold text-white">98.2%</div>
-                          <div className="text-[10px] text-indigo-300 font-bold mt-1">Real-time</div>
+                          <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-1">Diwali Trip Goal</div>
+                          <div className="text-xl font-bold text-white">30%</div>
+                          <div className="text-[10px] text-indigo-300 font-bold mt-1">₹12,000 of ₹40,000</div>
                         </div>
                       </div>
 
                       {/* Main Chart Area */}
                       <div className="bg-white/5 rounded-2xl border border-white/5 p-6 space-y-4">
                         <div className="flex items-center justify-between">
-                          <div className="text-xs font-bold text-white">Growth Performance</div>
+                          <div className="text-xs font-bold text-white">Income vs Expense</div>
                           <div className="flex gap-2">
                              <div className="w-2 h-2 rounded-full bg-indigo-500" />
                              <div className="w-2 h-2 rounded-full bg-emerald-500" />
@@ -109,10 +109,10 @@ const Landing = () => {
                         </div>
                         <div className="h-32 md:h-48 w-full flex items-end gap-1 px-2">
                            {[40, 70, 45, 90, 65, 80, 55, 95, 75, 85, 60, 100].map((h, i) => (
-                             <div 
-                               key={i} 
-                               className="flex-1 bg-gradient-to-t from-indigo-600/20 to-indigo-500/40 rounded-t-sm transition-all hover:to-indigo-400" 
-                               style={{ height: `${h}%` }} 
+                             <div
+                               key={i}
+                               className="flex-1 bg-gradient-to-t from-indigo-600/20 to-indigo-500/40 rounded-t-sm transition-all hover:to-indigo-400"
+                               style={{ height: `${h}%` }}
                              />
                            ))}
                         </div>
@@ -120,10 +120,10 @@ const Landing = () => {
 
                       {/* Recent Log */}
                       <div className="space-y-3">
-                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Recent Activity</div>
+                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Upcoming Bills</div>
                         {[
-                          { label: 'Cloud Infrastructure', amount: '₹1,24,000', status: 'Completed' },
-                          { label: 'Marketing Campaign', amount: '₹45,500', status: 'Pending' }
+                          { label: 'Car Loan EMI', amount: '₹12,500', status: 'Due Soon' },
+                          { label: 'Flat Rent', amount: '₹18,000', status: 'Upcoming' }
                         ].map((row, i) => (
                           <div key={i} className="flex items-center justify-between p-3 bg-white/[0.02] rounded-xl border border-white/5 text-[11px]">
                             <div className="flex items-center gap-3">
@@ -132,7 +132,7 @@ const Landing = () => {
                             </div>
                             <div className="flex items-center gap-4">
                               <span className="text-slate-400">{row.amount}</span>
-                              <span className={`px-2 py-0.5 rounded-full ${row.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'} text-[9px] font-bold`}>{row.status}</span>
+                              <span className={`px-2 py-0.5 rounded-full ${row.status === 'Due Soon' ? 'bg-amber-500/10 text-amber-400' : 'bg-slate-500/10 text-slate-400'} text-[9px] font-bold`}>{row.status}</span>
                             </div>
                           </div>
                         ))}
@@ -151,26 +151,64 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-display font-bold text-slate-900 mb-4">
-              Everything you need to scale
+              Everything you need to stay on top of money
             </h2>
             <p className="text-slate-500 text-lg max-w-2xl mx-auto">
-              Finma combines powerful analytics with enterprise-grade security.
+              Built around the day-to-day finance problems Indian households and teams actually deal with.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl hover:shadow-slate-200 transition-all duration-300">
               <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6">
-                <BarChart3 className="text-indigo-600 w-7 h-7" />
+                <Wallet className="text-indigo-600 w-7 h-7" />
               </div>
-              <h3 className="text-xl font-display font-bold text-slate-900 mb-4">Real-time Analytics</h3>
+              <h3 className="text-xl font-display font-bold text-slate-900 mb-4">Budgets & Alerts</h3>
               <p className="text-slate-500 leading-relaxed">
-                Connect your data sources and watch as your dashboard updates in real-time with beautiful charts.
+                Set a monthly cap per category and get flagged automatically when spend nears or crosses the limit.
               </p>
             </div>
 
-            {/* Feature 2 */}
+            <div className="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl hover:shadow-slate-200 transition-all duration-300">
+              <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mb-6">
+                <CalendarClock className="text-amber-600 w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-display font-bold text-slate-900 mb-4">Bills & EMI Tracking</h3>
+              <p className="text-slate-500 leading-relaxed">
+                Never miss rent, subscriptions, or loan installments. Track EMI progress and mark bills paid in one tap.
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl hover:shadow-slate-200 transition-all duration-300">
+              <div className="w-14 h-14 bg-violet-50 rounded-2xl flex items-center justify-center mb-6">
+                <Target className="text-violet-600 w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-display font-bold text-slate-900 mb-4">Savings Goals</h3>
+              <p className="text-slate-500 leading-relaxed">
+                Set targets like an emergency fund or a Diwali trip, log contributions, and watch progress in real time.
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl hover:shadow-slate-200 transition-all duration-300">
+              <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center mb-6">
+                <Users2 className="text-rose-600 w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-display font-bold text-slate-900 mb-4">Split Expenses</h3>
+              <p className="text-slate-500 leading-relaxed">
+                Share a bill across the team, track who has settled up, and see your own pending shares at a glance.
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl hover:shadow-slate-200 transition-all duration-300">
+              <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6">
+                <BarChart3 className="text-emerald-600 w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-display font-bold text-slate-900 mb-4">Real-time Analytics</h3>
+              <p className="text-slate-500 leading-relaxed">
+                Cash-flow trends, category breakdowns, and savings rate — updated the moment a transaction is logged.
+              </p>
+            </div>
+
             <div className="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl hover:shadow-slate-200 transition-all duration-300">
               <div className="w-14 h-14 bg-sky-50 rounded-2xl flex items-center justify-center mb-6">
                 <ShieldCheck className="text-sky-600 w-7 h-7" />
@@ -178,17 +216,6 @@ const Landing = () => {
               <h3 className="text-xl font-display font-bold text-slate-900 mb-4">RBAC Security</h3>
               <p className="text-slate-500 leading-relaxed">
                 Role-based access control built directly into the core. Assign Admin, Analyst, or Viewer roles.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl hover:shadow-slate-200 transition-all duration-300">
-              <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6">
-                <Zap className="text-emerald-600 w-7 h-7" />
-              </div>
-              <h3 className="text-xl font-display font-bold text-slate-900 mb-4">Zero Latency</h3>
-              <p className="text-slate-500 leading-relaxed">
-                Optimized MongoDB aggregations ensure your data is processed and delivered in milliseconds.
               </p>
             </div>
           </div>
@@ -199,10 +226,10 @@ const Landing = () => {
       <section className="py-24 overflow-hidden relative bg-indigo-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
           <h2 className="text-4xl md:text-5xl font-display font-extrabold mb-8">
-            Ready to take control of your data?
+            Ready to take control of your money?
           </h2>
           <p className="text-indigo-100 text-xl mb-12 max-w-2xl mx-auto">
-            Join 1,000+ teams who use Finma to power their financial dashboards.
+            Budgets, bills, goals, and shared expenses — all in one place, built for how India actually spends and saves.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
              <Link 
